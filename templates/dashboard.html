@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback Dashboard</title>
+</head>
+<body>
+    <h1>Feedback Dashboard</h1>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Site</th>
+            <th>Feedback</th>
+            <th>Date</th>
+        </tr>
+        {% for feedback in feedbacks %}
+        <tr>
+            <td>{{ feedback.id }}</td>
+            <td>{{ feedback.site }}</td>
+            <td>{{ feedback.feedback }}</td>
+            <td>{{ feedback.date }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
