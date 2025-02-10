@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for, session
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session, flash
 from flask_cors import CORS
 import logging
 from flask_sqlalchemy import SQLAlchemy
@@ -69,8 +69,28 @@ def submit_feedback():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    feedbacks = Feedback.query.all()
-    return render_template('dashboard.html', feedbacks=feedbacks)
+    sort = request.args.get('sort', 'date')
+    
+    if sort == 'site':
+        feedbacks = Feedback.query.order_by(Feedback.site.asc(), Feedback.date.desc()).all()
+    else:  # default to date
+        feedbacks = Feedback.query.order_by(Feedback.date.desc()).all()
+    
+    return render_template('dashboard.html', feedbacks=feedbacks, current_sort=sort)
+
+@app.route('/delete_feedback/<int:feedback_id>', methods=['POST'])
+@login_required
+def delete_feedback(feedback_id):
+    try:
+        feedback = Feedback.query.get_or_404(feedback_id)
+        db.session.delete(feedback)
+        db.session.commit()
+        flash('Feedback deleted successfully', 'success')
+    except Exception as e:
+        app.logger.error(f'Error deleting feedback: {str(e)}')
+        flash('Error deleting feedback', 'error')
+        db.session.rollback()
+    return redirect(url_for('dashboard'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
